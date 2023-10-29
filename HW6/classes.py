@@ -56,6 +56,33 @@ class State:
                 if self.board[i][j] == 0:
                     return False
         return True
+    
+    def get_degree(self,coordinate:tuple):
+        board = self.board
+        x = coordinate[0]
+        y = coordinate[1]
+        # Calculate the degree:
+        degree = 0 
+        # 1. The constraint to the valriables in the same row
+        for i in range(1,10):
+            if board[x][i] == 0:
+                degree = degree + 1
+        # 2. The constraint to the valriables in the same col
+        for i in range(1,10):
+            if board[i][y] == 0:
+                degree = degree + 1
+        # 3. The constraint to the valriables in the same block
+        block_start_x = ((x-1)//3)*3+1
+        block_start_y = ((y-1)//3)*3+1
+        for i in range(block_start_x,block_start_x+3):
+            for j in range(block_start_y,block_start_y+3):
+                if board[i][j] == 0 and i != x and j != y:
+                    degree = degree + 1
+        # Since this method might be used before/after assignment....
+        if board[x][y] == 0:
+            degree = degree - 3
+        
+        return degree
 
     # The input should be the coordinate of a variable, and this method return its priority
     def get_priority(self,coordinate:tuple):
@@ -78,23 +105,7 @@ class State:
                     remain_values.remove(board[i][j])
         remain_values_count = len(remain_values)
 
-        # Calculate the degree:
-        degree = -3 # Since the following calculation include the degree to the variable itself. We -3 at first
-        # 1. The constraint to the valriables in the same row
-        for i in range(1,10):
-            if board[x][i] == 0:
-                degree = degree + 1
-        # 2. The constraint to the valriables in the same col
-        for i in range(1,10):
-            if i != x and board[i][y] == 0:
-                degree = degree + 1
-        # 3. The constraint to the valriables in the same block
-        block_start_x = ((x-1)//3)*3+1
-        block_start_y = ((y-1)//3)*3+1
-        for i in range(block_start_x,block_start_x+3):
-            for j in range(block_start_y,block_start_y+3):
-                if board[i][j] == 0:
-                    degree = degree + 1
+        degree = self.get_degree(coordinate)
         
         # Return the priority value: (lower value means higher priority)
         return remain_values_count * 10000 + degree * 100 + y*10 + x
@@ -132,17 +143,19 @@ class State:
     
 
     def print_board(self):
+        print("-------------------------")
         for i in range(1,10):
+            print("|",end=" ")
             for j in range(1,10):
                 if self.board[i][j] == 0:
                     print(" ",end=" ")
                 else:
                     print(self.board[i][j],end=" ")
                 if j%3 == 0:
-                    print("|",end='')
+                    print("|",end=" ")
             if i%3 == 0:
                 print("")
-                print("---------------------")
+                print("-------------------------")
             else:
                 print("")
     
