@@ -24,12 +24,12 @@ class Variable:
 # 4. Test state Function
 # 4. Sort variable function
 class State:
-    def __init__(self,board:List[List[int]],Assginments:List):
+    def __init__(self,board:List[List[int]],assginments:List):
         self.board = [[0] * 10 for _ in range(10)]  # Creating a 2D list
         # Add a margin to the board:
         for i in range(9):
             self.board[i + 1] = [0] + board[i]
-        self.assignments = Assginments
+        self.assignments = assginments
         self.variables = self.get_variables()
 
     def board_modify(self,coordinate:tuple,value:int):
@@ -40,9 +40,15 @@ class State:
     def get_assignments(self):
         return self.assignments
     
-    def add_assignment(self,variable:Variable,value:int):
+    def add_assignment(self,coordinate:tuple,value:int):
         # append a (coordinate,value) pair into the assignment list:
-        self.assignments.append((variable.var_coordinate,value))
+        self.assignments.append((coordinate,value))   # e.g [((1,2),5),((3,4),7)]
+
+    # Remove assignment according to variable's coordinate
+    def remove_assignment(self,coordinate:tuple):
+        for assignment in self.assignments:
+            if assignment[0] == coordinate:
+                self.assignments.remove(assignment)
 
     def finished(self)->bool:
         for i in range(1,10):
@@ -57,30 +63,37 @@ class State:
         x = coordinate[0]
         y = coordinate[1]
         remain_values = [1,2,3,4,5,6,7,8,9]
+        # Exclude all invalid values:
         for i in range(1,10):
             if i!= y and board[x][i] in remain_values:
                 remain_values.remove(board[x][i])
         for i in range(1,10):
             if i!= x and board[i][y] in remain_values:
                 remain_values.remove(board[i][y])
+        block_start_x = ((x-1)//3)*3+1
+        block_start_y = ((y-1)//3)*3+1
+        for i in range(block_start_x,block_start_x+3):
+            for j in range(block_start_y,block_start_y+3):
+                if board[i][j] in remain_values:
+                    remain_values.remove(board[i][j])
         remain_values_count = len(remain_values)
 
         # Calculate the degree:
-        degree = 0
+        degree = -3 # Since the following calculation include the degree to the variable itself. We -3 at first
         # 1. The constraint to the valriables in the same row
         for i in range(1,10):
             if board[x][i] == 0:
                 degree = degree + 1
         # 2. The constraint to the valriables in the same col
         for i in range(1,10):
-            if board[i][y] == 0:
+            if i != x and board[i][y] == 0:
                 degree = degree + 1
         # 3. The constraint to the valriables in the same block
         block_start_x = ((x-1)//3)*3+1
         block_start_y = ((y-1)//3)*3+1
         for i in range(block_start_x,block_start_x+3):
             for j in range(block_start_y,block_start_y+3):
-                if i != x and j != y and board[i][j] == 0:
+                if board[i][j] == 0:
                     degree = degree + 1
         
         # Return the priority value: (lower value means higher priority)
@@ -93,11 +106,17 @@ class State:
         y = coordinate[1]
         remain_values = [1,2,3,4,5,6,7,8,9]
         for i in range(1,10):
-            if i!= y and board[x][i] in remain_values:
+            if board[x][i] in remain_values:
                 remain_values.remove(board[x][i])
         for i in range(1,10):
-            if i!= x and board[i][y] in remain_values:
+            if board[i][y] in remain_values:
                 remain_values.remove(board[i][y])
+        block_start_x = ((x-1)//3)*3+1
+        block_start_y = ((y-1)//3)*3+1
+        for i in range(block_start_x,block_start_x+3):
+            for j in range(block_start_y,block_start_y+3):
+                if board[i][j] in remain_values:
+                    remain_values.remove(board[i][j])
         return remain_values
     
     # Get all the variables that have not been assigned values yet. And put them into a list.

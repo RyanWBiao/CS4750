@@ -15,14 +15,26 @@ test_puzzle = [
     [2,0,0,5,3,8,7,0,0]
 ]
 
-test_state = State(test_puzzle,[])
+test_puzzle2 = [
+    [0,0,0,0,0,0,0,0,9],
+    [0,0,0,0,0,7,0,1,0],
+    [7,6,0,9,0,0,3,0,8],
+    [0,0,1,6,0,0,4,3,0],
+    [0,0,0,0,0,0,0,0,6],
+    [0,5,0,0,7,0,0,8,0],
+    [0,0,3,0,0,1,0,2,0],
+    [9,1,0,0,0,3,0,0,0],
+    [0,0,0,0,0,5,1,9,0],
+]
+
+test_state = State(test_puzzle2,[])
 
 test_state.print_board()
 
-for variable in test_state.get_variables():
-    print(variable.var_coordinate(),end=" ")
-    print(variable.var_domain(),end=" ")
-    print(variable.var_priority())
+# for variable in test_state.get_variables():
+#     print(variable.var_coordinate(),end=" ")
+#     print(variable.var_domain(),end=" ")
+#     print(variable.var_priority())
 
 
 def backtracking(init_state:State):
@@ -33,20 +45,24 @@ def backtracking(init_state:State):
     # Get the variable with mimimun priority value. It means this variable will be assign at first
     # This step include MRV
     # The conflict values have been removed from the domain when the variables were made. It's equivalent to forward checking.
-    variables = init_state.get_variables()
+    variables = init_state.get_variables() # The variables are newly generated
     min_priority_variable = variables[0]
     for variable in variables:
         if variable.var_priority() < min_priority_variable.var_priority():
             min_priority_variable = variable
     
     # Iterate through the domain 
-    for value in min_priority_variable.var_domain():
-        init_state.add_assignment(min_priority_variable,value) # (1) add assignment to the state
+    domain = min_priority_variable.var_domain()
+    for value in domain:
+        init_state.add_assignment(min_priority_variable.var_coordinate(),value) # (1) add assignment to the state
         init_state.board_modify(min_priority_variable.var_coordinate(),value) # (2) change the board:
         result = backtracking(init_state)  
         if result != False:
             return result  # The result is either an assignment or False
-        # Unfinied
+        # If the result is False (This assginment will lead to failure) remove this assignment:
+        init_state.remove_assignment(min_priority_variable.var_coordinate())
+        init_state.board_modify(min_priority_variable.var_coordinate(),0) # Modify the value back to 0
+
     # All values lead to failure
     return False
 
@@ -56,10 +72,10 @@ def backtracking(init_state:State):
 print("***********************")
 assignments = backtracking(test_state)
 
-if assignments != False:
-    for assignment in assignments:
-        print(assignment[0][0],end=" ")
-        print(assignment[0][1],end=" ")
-        print(assignment[1])
+# if assignments != False:
+#     for assignment in assignments:
+#         print(assignment[0][0],end=" ")
+#         print(assignment[0][1],end=" ")
+#         print(assignment[1])
 
 test_state.print_board()
