@@ -6,14 +6,17 @@ import copy
 # 2. Priority calculated by (constraints count) and (remaining value count)
 # 3. Coordinate
 class Variable:
-    def __init__(self,coordinate:tuple,priority:int) -> None:
-        self.coordinate = coordinate
-        self.priority = priority
+    def __init__(self,coordinate:tuple,priority:int,domain:List[int]) -> None:
+        self.__coordinate = coordinate
+        self.__priority = priority
+        self.__domain = domain
 
     def var_coordinate(self):
-        return self.coordinate
+        return self.__coordinate
     def var_priority(self):
-        return self.priority
+        return self.__priority
+    def var_domain(self):
+        return self.__domain
 
 # 1. An array of current distribution
 # 2. Variable List
@@ -29,7 +32,7 @@ class State:
         self.assignments = Assginments
         self.variables = self.get_variables()
 
-    # The input should be the coordinate of a variable and borad, and this method return its priority
+    # The input should be the coordinate of a variable, and this method return its priority
     def get_priority(self,coordinate:tuple):
         board = self.board
         x = coordinate[0]
@@ -64,6 +67,20 @@ class State:
         # Return the priority value: (lower value means higher priority)
         return remain_values_count * 10000 + degree * 100 + y*10 + x
     
+    # This mehtod get the domain of a variable (maximum domain is [1-9])
+    def get_domain(self,coordinate:tuple)->List[int]:
+        board = self.board
+        x = coordinate[0]
+        y = coordinate[1]
+        remain_values = [1,2,3,4,5,6,7,8,9]
+        for i in range(1,10):
+            if i!= y and board[x][i] in remain_values:
+                remain_values.remove(board[x][i])
+        for i in range(1,10):
+            if i!= x and board[i][y] in remain_values:
+                remain_values.remove(board[i][y])
+        return remain_values
+    
     # Get all the variables that have not been assigned values yet. And put them into a list.
     def get_variables(self) -> List[Variable]:
         # Get the variables according to board
@@ -71,7 +88,7 @@ class State:
         for i in range(1,10):
             for j in range(1,10):
                 if self.board[i][j] == 0:
-                    new_variable = Variable((i,j),self.get_priority((i,j)))
+                    new_variable = Variable((i,j),self.get_priority((i,j)),self.get_domain((i,j)))
                     variables.append(new_variable)
         return variables
     

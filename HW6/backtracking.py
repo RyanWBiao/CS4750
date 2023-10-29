@@ -21,5 +21,6 @@ test_state.print_board()
 
 for variable in test_state.get_variables():
     print(variable.var_coordinate(),end=" ")
+    print(variable.var_domain(),end=" ")
     print(variable.var_priority())
 
