@@ -24,3 +24,28 @@ for variable in test_state.get_variables():
     print(variable.var_domain(),end=" ")
     print(variable.var_priority())
 
+
+def backtracking(init_state:State):
+    # Termination step:
+    if init_state.finished():
+        return init_state.get_assignments()
+    
+    # Get the variable with mimimun priority value. It means this variable will be assign at first
+    # This step include MRV
+    # The conflict values have been removed from the domain when the variables were made. It's equivalent to forward checking.
+    variables = init_state.get_variables()
+    min_priority_variable = variables[1]
+    for variable in variables:
+        if variable.var_priority() < min_priority_variable.var_priority():
+            min_priority_variable = variable
+    
+    # Iterate through the domain 
+    for value in min_priority_variable.var_domain():
+        pass
+
+
+    # print(min_priority_variable.var_coordinate())
+
+
+print("***********************")
+backtracking(test_state)

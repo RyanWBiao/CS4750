@@ -31,6 +31,19 @@ class State:
             self.board[i + 1] = [0] + board[i]
         self.assignments = Assginments
         self.variables = self.get_variables()
+    
+    def get_assignments(self):
+        return self.assignments
+    
+    def add_assignment(self,value):
+        pass
+
+    def finished(self)->bool:
+        for i in range(1,10):
+            for j in range(1,10):
+                if self.board[i][j] == 0:
+                    return False
+        return True
 
     # The input should be the coordinate of a variable, and this method return its priority
     def get_priority(self,coordinate:tuple):
