@@ -31,12 +31,18 @@ class State:
             self.board[i + 1] = [0] + board[i]
         self.assignments = Assginments
         self.variables = self.get_variables()
+
+    def board_modify(self,coordinate:tuple,value:int):
+        x = coordinate[0]
+        y = coordinate[1]
+        self.board[x][y] = value
     
     def get_assignments(self):
         return self.assignments
     
-    def add_assignment(self,value):
-        pass
+    def add_assignment(self,variable:Variable,value:int):
+        # append a (coordinate,value) pair into the assignment list:
+        self.assignments.append((variable.var_coordinate,value))
 
     def finished(self)->bool:
         for i in range(1,10):
