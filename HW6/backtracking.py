@@ -37,8 +37,9 @@ def backtracking(init_state:State):
         if assignment_count <= 4:
             print("The {} assignment: ".format(assignment_count))
             print("The variable ({},{}) is selected".format(min_priority_variable.var_coordinate()[0],min_priority_variable.var_coordinate()[1]))
-            print("The degree of this variable is: {}".format(init_state.get_degree(min_priority_variable.var_coordinate())))
             print("The domain of this variable: {}".format(min_priority_variable.var_domain()))
+            print("The domain size: {}".format(len(min_priority_variable.var_domain())))
+            print("The degree of this variable is: {}".format(init_state.get_degree(min_priority_variable.var_coordinate())))
             print("The value {} is assigned to it".format(value))
             print("")
 
@@ -61,7 +62,7 @@ from sudoku import test_puzzle,test_puzzle2,instance_1,instance_2,instance_3
 print("**************************************")
 
 # 
-state = State(instance_1,[])
+state = State(instance_3,[])
 state.print_board()
 
 # Use a global variable to track the number of assginment:
